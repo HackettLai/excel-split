@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Splitter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>✂️ Excel Splitter</h1>
+        <p class="subtitle">Split multiple emails in a column into separate rows</p>
+        
+        <div class="upload-section">
+            <div class="file-input-wrapper">
+                <label for="fileInput" class="file-label">
+                    <span class="file-icon">📂</span>
+                    <span class="file-text">Choose Excel/CSV File</span>
+                </label>
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+                <span id="fileName" class="file-name"></span>
+            </div>
+        </div>
+
+        <div class="column-section" id="columnSection" style="display: none;">
+            <div class="input-group">
+                <label for="columnInput">Column Header Name:</label>
+                <input type="text" id="columnInput" placeholder="e.g., Email (BCC)" />
+                <button id="confirmBtn" class="btn btn-primary">Confirm & Split</button>
+            </div>
+        </div>
+
+        <div id="loadingIndicator" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+        <div id="resultSection" class="result-section" style="display: none;">
+            <div class="result-header">
+                <h2>✅ Results</h2>
+                <button id="downloadBtn" class="btn btn-success">
+                    <span class="download-icon">⬇</span> Download Excel
+                </button>
+            </div>
+            <div class="table-wrapper">
+                <table id="resultTable"></table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="split.js"></script>
+</body>
+</html>
