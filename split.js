@@ -1,6 +1,7 @@
 let originalData = null;
 let processedData = null;
 let headers = null;
+let highlightedRows = new Set(); // Track which rows were split/modified
 
 const fileInput = document.getElementById('fileInput');
 const fileName = document.getElementById('fileName');
@@ -12,9 +13,33 @@ const errorMessage = document.getElementById('errorMessage');
 const resultSection = document.getElementById('resultSection');
 const resultTable = document.getElementById('resultTable');
 const downloadBtn = document.getElementById('downloadBtn');
+const inputHint = document.getElementById('inputHint');
+
+// Radio buttons
+const radioButtons = document.querySelectorAll('input[name="inputType"]');
 
 // File upload handler
 fileInput.addEventListener('change', handleFileUpload);
+
+// Radio button change handler
+radioButtons.forEach(radio => {
+    radio.addEventListener('change', updateInputPlaceholder);
+});
+
+function updateInputPlaceholder() {
+    const selectedType = document.querySelector('input[name="inputType"]:checked').value;
+    
+    if (selectedType === 'name') {
+        columnInput.placeholder = 'Enter column name (e.g., Email)';
+        inputHint.textContent = 'Enter the exact column header name';
+    } else {
+        columnInput.placeholder = 'Enter column number (e.g., 3)';
+        inputHint.textContent = 'Enter the column position (1 = first column, 2 = second column, etc.)';
+    }
+    
+    columnInput.value = '';
+    columnInput.focus();
+}
 
 function handleFileUpload(event) {
     const file = event.target.files[0];
@@ -33,7 +58,7 @@ function handleFileUpload(event) {
             const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
             const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
-            if (jsonData.length < 2) {
+            if (jsonData.length < 1) {
                 showError('⚠️ No data found in the file!');
                 return;
             }
@@ -54,7 +79,7 @@ function handleFileUpload(event) {
                 const csvData = e.target.result;
                 const jsonData = parseCSV(csvData);
                 
-                if (jsonData.length < 2) {
+                if (jsonData.length < 1) {
                     showError('⚠️ No data found in the file!');
                     return;
                 }
@@ -107,10 +132,11 @@ columnInput.addEventListener('keypress', function(e) {
 });
 
 function processSplit() {
-    const userColumnName = columnInput.value.trim().toLowerCase();
+    const userInput = columnInput.value.trim();
+    const inputType = document.querySelector('input[name="inputType"]:checked').value;
     
-    if (!userColumnName) {
-        showError('❌ Column name cannot be empty.');
+    if (!userInput) {
+        showError(`❌ Please enter a column ${inputType === 'name' ? 'name' : 'index'}.`);
         return;
     }
 
@@ -126,17 +152,48 @@ function processSplit() {
     // Process in next tick to allow UI to update
     setTimeout(() => {
         try {
-            const emailColIndex = headers.findIndex(
-                h => String(h).trim().toLowerCase() === userColumnName
-            );
+            let emailColIndex = -1;
+            
+            if (inputType === 'index') {
+                // User selected column index
+                const columnIndex = parseInt(userInput);
+                
+                if (isNaN(columnIndex)) {
+                    showError('❌ Please enter a valid number for column index.');
+                    loadingIndicator.style.display = 'none';
+                    return;
+                }
+                
+                if (columnIndex < 1) {
+                    showError('❌ Column index must be 1 or greater.');
+                    loadingIndicator.style.display = 'none';
+                    return;
+                }
+                
+                emailColIndex = columnIndex - 1; // Convert to 0-based index
+                
+                if (emailColIndex >= originalData[0].length) {
+                    showError(`❌ Column index ${columnIndex} is out of range. Maximum is ${originalData[0].length}.`);
+                    loadingIndicator.style.display = 'none';
+                    return;
+                }
+            } else {
+                // User selected column name
+                const userColumnName = userInput.toLowerCase();
+                emailColIndex = headers.findIndex(
+                    h => String(h).trim().toLowerCase() === userColumnName
+                );
 
-            if (emailColIndex === -1) {
-                showError(`❌ Column "${columnInput.value.trim()}" not found.`);
-                loadingIndicator.style.display = 'none';
-                return;
+                if (emailColIndex === -1) {
+                    showError(`❌ Column "${userInput}" not found. Please check the spelling.`);
+                    loadingIndicator.style.display = 'none';
+                    return;
+                }
             }
 
             let newData = [headers];
+            highlightedRows = new Set();
+            let currentRowIndex = 1; // Track position in new data array
 
             // Process each data row
             for (let i = 1; i < originalData.length; i++) {
@@ -146,6 +203,7 @@ function processSplit() {
                 // Skip or keep if N/A or blank
                 if (!emailCell || String(emailCell).trim().toUpperCase() === 'N/A') {
                     newData.push(row);
+                    currentRowIndex++;
                     continue;
                 }
 
@@ -158,14 +216,24 @@ function processSplit() {
                 // If no valid email after cleaning, keep as is
                 if (emails.length === 0) {
                     newData.push(row);
+                    currentRowIndex++;
                     continue;
                 }
 
-                // Create separate rows for each email
+                // If only one email and it matches original, no split occurred
+                if (emails.length === 1 && emails[0] === String(emailCell).trim()) {
+                    newData.push(row);
+                    currentRowIndex++;
+                    continue;
+                }
+
+                // Create separate rows for each email and mark them as highlighted
                 emails.forEach(email => {
                     const newRow = [...row];
                     newRow[emailColIndex] = email;
                     newData.push(newRow);
+                    highlightedRows.add(currentRowIndex);
+                    currentRowIndex++;
                 });
             }
 
@@ -191,7 +259,8 @@ function displayResults(data) {
 
     // Add data rows
     for (let i = 1; i < data.length; i++) {
-        tableHTML += '<tr>';
+        const isHighlighted = highlightedRows.has(i);
+        tableHTML += `<tr${isHighlighted ? ' class="highlighted"' : ''}>`;
         data[i].forEach(cell => {
             tableHTML += `<td>${escapeHtml(String(cell || ''))}</td>`;
         });
@@ -222,7 +291,39 @@ function downloadExcel() {
         return;
     }
 
-    const ws = XLSX.utils.aoa_to_sheet(processedData);
+    // Create a copy of processed data with marker column
+    const excelData = processedData.map((row, index) => {
+        if (index === 0) {
+            // Add header for marker column
+            return ['[SPLIT ROW]', ...row];
+        } else {
+            // Add marker for highlighted rows
+            const marker = highlightedRows.has(index) ? '✓ SPLIT' : '';
+            return [marker, ...row];
+        }
+    });
+
+    // Create worksheet
+    const ws = XLSX.utils.aoa_to_sheet(excelData);
+    
+    // Set column widths
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    const colWidths = [];
+    
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+        let maxWidth = 10;
+        for (let R = range.s.r; R <= range.e.r; ++R) {
+            const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+            if (ws[cellAddress] && ws[cellAddress].v) {
+                const cellLength = String(ws[cellAddress].v).length;
+                maxWidth = Math.max(maxWidth, cellLength);
+            }
+        }
+        colWidths.push({ wch: Math.min(maxWidth + 2, 50) });
+    }
+    ws['!cols'] = colWidths;
+    
+    // Create workbook
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Data_Split');
     XLSX.writeFile(wb, 'Data_Split.xlsx');

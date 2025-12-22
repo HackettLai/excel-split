@@ -3,54 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Splitter</title>
+    <title>Data Split Tool</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1>✂️ Excel Splitter</h1>
-        <p class="subtitle">Split multiple emails in a column into separate rows</p>
-        
+        <header>
+            <h1>📊 Data Split Tool</h1>
+            <p>Upload your Excel/CSV file and split multi-value cells into separate rows</p>
+        </header>
+
         <div class="upload-section">
-            <div class="file-input-wrapper">
-                <label for="fileInput" class="file-label">
-                    <span class="file-icon">📂</span>
-                    <span class="file-text">Choose Excel/CSV File</span>
+            <div class="file-upload">
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" hidden>
+                <label for="fileInput" class="upload-btn">
+                    📁 Choose File
                 </label>
-                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
-                <span id="fileName" class="file-name"></span>
+                <span id="fileName" class="file-name">No file selected</span>
             </div>
         </div>
 
-        <div class="column-section" id="columnSection" style="display: none;">
-            <div class="input-group">
-                <label for="columnInput">Column Header Name:</label>
-                <input type="text" id="columnInput" placeholder="e.g., Email (BCC)" />
-                <button id="confirmBtn" class="btn btn-primary">Confirm & Split</button>
+        <div id="columnSection" class="column-section" style="display: none;">
+            <h2>Select Column to Split</h2>
+            
+            <div class="input-type-selector">
+                <label class="radio-option">
+                    <input type="radio" name="inputType" value="name" checked>
+                    <span>Column Name</span>
+                </label>
+                <label class="radio-option">
+                    <input type="radio" name="inputType" value="index">
+                    <span>Column Index</span>
+                </label>
             </div>
+
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="columnInput" 
+                    placeholder="Enter column name (e.g., Email)"
+                    autocomplete="off"
+                >
+                <button id="confirmBtn" class="confirm-btn">Split Data</button>
+            </div>
+            <p class="hint" id="inputHint">Enter the exact column header name</p>
         </div>
 
         <div id="loadingIndicator" class="loading" style="display: none;">
             <div class="spinner"></div>
-            <p>Processing...</p>
+            <p>Processing your data...</p>
         </div>
 
         <div id="errorMessage" class="error-message" style="display: none;"></div>
 
         <div id="resultSection" class="result-section" style="display: none;">
             <div class="result-header">
-                <h2>✅ Results</h2>
-                <button id="downloadBtn" class="btn btn-success">
-                    <span class="download-icon">⬇</span> Download Excel
-                </button>
+                <div class="result-title-section">
+                    <h2>✅ Results</h2>
+                    <p class="result-note">
+                        <span class="highlight-indicator"></span>
+                        Yellow highlighted rows indicate data that was split from multi-value cells
+                    </p>
+                </div>
+                <button id="downloadBtn" class="download-btn">⬇️ Download Excel</button>
             </div>
-            <div class="table-wrapper">
+
+            <div class="table-container">
                 <table id="resultTable"></table>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="split.js"></script>
 </body>
 </html>
