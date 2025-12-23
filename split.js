@@ -211,9 +211,58 @@ function processData() {
     }, 100);
 }
 
+// function splitColumn(columnIndex) {
+//     const results = [];
+//     const separators = [',', ';', '/', '\n', '，', '；', '／'];
+
+//     originalData.forEach((row) => {
+//         const fullRow = [...row];
+//         while (fullRow.length < headers.length) {
+//             fullRow.push('');
+//         }
+
+//         const cellValue = String(fullRow[columnIndex] || '').trim();
+
+//         if (!cellValue) {
+//             results.push({
+//                 data: fullRow,
+//                 isSplit: false
+//             });
+//             return;
+//         }
+
+//         let splitValues = [cellValue];
+
+//         for (const sep of separators) {
+//             if (cellValue.includes(sep)) {
+//                 splitValues = cellValue.split(sep).map(v => v.trim()).filter(v => v);
+//                 break;
+//             }
+//         }
+
+//         if (splitValues.length > 1) {
+//             splitValues.forEach(value => {
+//                 const newRow = [...fullRow];
+//                 newRow[columnIndex] = value;
+//                 results.push({
+//                     data: newRow,
+//                     isSplit: true
+//                 });
+//             });
+//         } else {
+//             results.push({
+//                 data: fullRow,
+//                 isSplit: false
+//             });
+//         }
+//     });
+
+//     return results;
+// }
 function splitColumn(columnIndex) {
     const results = [];
-    const separators = [',', ';', '\n', '，', '；'];
+    const separators = [',', ';', '/', '&', '\n', '，', '；', '／'];
+    const specialTerms = ['n/a', 'N/A', 'n\\a', 'N\\A']; // Terms that should NOT be split
 
     originalData.forEach((row) => {
         const fullRow = [...row];
@@ -224,6 +273,20 @@ function splitColumn(columnIndex) {
         const cellValue = String(fullRow[columnIndex] || '').trim();
 
         if (!cellValue) {
+            results.push({
+                data: fullRow,
+                isSplit: false
+            });
+            return;
+        }
+
+        // Check if the cell value is a special term (case-insensitive)
+        const isSpecialTerm = specialTerms.some(term => 
+            cellValue.toLowerCase() === term.toLowerCase()
+        );
+
+        if (isSpecialTerm) {
+            // Don't split special terms
             results.push({
                 data: fullRow,
                 isSplit: false
