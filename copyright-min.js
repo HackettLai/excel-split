@@ -1,0 +1,1 @@
+function e(){const e=(new Date).getFullYear();document.getElementById("thisYear").innerHTML=e}window.addEventListener("load",e,!0);
