@@ -44,7 +44,6 @@ Export your cleaned data as Excel.
 5. **Download** your cleaned data as an Excel file
 
 ### Supported Separators
-
 The tool automatically detects and splits on these separators:
 - Comma: `,` `，`
 - Semicolon: `;` `；`
@@ -53,7 +52,6 @@ The tool automatically detects and splits on these separators:
 - Newline: `\n`
 
 ### Protected Terms
-
 These terms are **NOT** split even if they contain separators:
 - `N/A` `n/a` `N\A` `n\a`
 
@@ -71,7 +69,6 @@ These terms are **NOT** split even if they contain separators:
 Simply visit the [live demo](https://excel-split.hackettlai.com) - no installation needed!
 
 ### Option 2: Run Locally
-
 1. Clone this repository:
 ```bash
 git clone https://github.com/yourusername/data-split-tool.git
@@ -160,7 +157,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📊 Version History
 
-### v1.2.1 (Current)
+### v1.3.0 (Current)
+- 🐛 Bug Fixed to handle multiple different separators in the same cell
+
+### v1.2.1
 - ✨ Added clickable column badges for easy selection
 - 🛡️ Protected special terms (N/A) from splitting
 - 🎨 Improved visual feedback with success messages
@@ -180,12 +180,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✂️ Basic split functionality
 
 ## 🐛 Known Issues
-
 - Very large files (>5MB) may take longer to process
 - Some special characters in headers may need manual encoding
 
 ## 📮 Support
-
 Having issues? Please [open an issue](https://github.com/HackettLai/data-split-tool/issues) on GitHub.
 
 ---
