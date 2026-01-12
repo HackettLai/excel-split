@@ -32,7 +32,7 @@ View split data with visual highlighting showing which rows were created from mu
 ![](https://upload.hackettlai.com/default/2026/s2-1768197719257.jpg)
 
 ### Download
-Export your cleaned data with formatting preserved.
+Export your cleaned data as Excel.
 ![](https://upload.hackettlai.com/default/2026/s3-1768197719265.jpg)
 
 ## 🔧 How It Works
