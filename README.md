@@ -4,16 +4,17 @@ A lightweight web-based tool to split multi-value cells in Excel/CSV files into 
 
 ![Version](https://img.shields.io/badge/version-1.2.1-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Static Badge](https://img.shields.io/badge/AI%20Assist-Claude%20Sonnet%204.5-orange)
 
 ## 🎯 Features
 
 - **📁 Multi-format Support**: Works with Excel (.xlsx, .xls) and CSV files
+- **🔎 Auto Column Detect**: Automatically detects column name (Also work on table without column head)
 - **✂️ Smart Splitting**: Automatically detects common separators (commas, semicolons, slashes, etc.)
 - **🎨 Visual Feedback**: Highlights split rows for easy identification
 - **🌐 Multi-language**: Supports both Western and Chinese separators (`,` `，` `;` `；` `/` `／`)
 - **🛡️ Special Term Protection**: Preserves terms like "N/A" without splitting
 - **💾 Excel Export**: Download results with formatting and highlighting preserved
-- **📱 Responsive Design**: Works on desktop and mobile devices
 - **🚀 No Backend Required**: Runs entirely in your browser
 
 ## 🚀 Demo
@@ -24,12 +25,15 @@ A lightweight web-based tool to split multi-value cells in Excel/CSV files into 
 
 ### Upload & Configure
 Upload your file and select which column to split using either column names or index numbers.
+![](https://upload.hackettlai.com/default/2026/s1-1768197719251.jpg)
 
 ### Results Preview
 View split data with visual highlighting showing which rows were created from multi-value cells.
+![](https://upload.hackettlai.com/default/2026/s2-1768197719257.jpg)
 
 ### Download
 Export your cleaned data with formatting preserved.
+![](https://upload.hackettlai.com/default/2026/s3-1768197719265.jpg)
 
 ## 🔧 How It Works
 
