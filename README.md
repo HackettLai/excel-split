@@ -2,7 +2,7 @@
 
 A lightweight web-based tool to split multi-value cells in Excel/CSV files into separate rows. Perfect for cleaning data where multiple values are stored in a single cell.
 
-![Version](https://img.shields.io/badge/version-1.2.1-blue)
+![Version](https://img.shields.io/badge/version-1.3.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Static Badge](https://img.shields.io/badge/AI%20Assist-Claude%20Sonnet%204.5-orange)
 
