@@ -147,7 +147,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 **Hackett Lai**
 
 - GitHub: [@HackettLai](https://github.com/HackettLai)
-- Website: [Your Website](https://hackettlai.com)
+- Website: [HERE](https://hackettlai.com)
 
 ## 🙏 Acknowledgments
 
